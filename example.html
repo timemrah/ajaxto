@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example</title>
+    <script src="ajaxto.js"></script>
+</head>
+<body>
+
+<script>
+    const data = new FormData();
+    data.append('id', 5);
+
+    ajaxto.post('response.html').data(data).send(response => {
+        console.log(response);
+    });
+</script>
+
+</body>
+</html>
