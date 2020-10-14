@@ -2,9 +2,12 @@
 require 'ajaxto.php';
 
 
-
 if(empty($_FILES["file"]["name"][0])){
-    ajaxto::res(false, 'Hiç dosya gönderilmemiş', 'empty');
+
+    ajaxto::resFalse(422, 'No files were sent', 'empty');
+
 } else{
-    ajaxto::res(true, 'Dosyalar başarıyla alındı', 'success', $_FILES);
+
+    ajaxto::resTrue(200, 'Files have been received', 'success', $_FILES);
+
 }
