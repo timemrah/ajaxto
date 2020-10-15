@@ -1,10 +1,18 @@
-const ajaxto = new function(){
+const ajaxto = function(){
 
     const Controller = {};
-    const request    = {};
-    const response   = {};
+    const request    = {
+        method : 'GET',
+        url    : null,
+        data   : {},
+        header : {}
+    };
+    const response   = {
+        body   : null,
+        header : null
+    };
 
-    //CALLBACK FUNCTIONS
+    // CALLBACK FUNCTIONS >>
     let progress   = () => {};
     let success    = () => {};
     let fail       = () => {};
@@ -12,14 +20,30 @@ const ajaxto = new function(){
     let resFalse   = () => {};
     let done       = () => {};
     let notFound   = () => {};
+    // CALLBACK FUNCTIONS //
 
-    request.method = 'GET';
-    request.url    = null;
-    request.data   = {};
-    request.header = {};
+    let ajaxResponse = null;
+    const defaultAjaxResponse = {
+        xhr      : null,
+        httpCode : null,
+        status   : null,
+        code     : null,
+        msg      : null,
+        data     : null,
+        validation: null,
+        clientProcess:{
+            innerHtml : null,
+            class: null,
+            direct: null
+        }
+    };
 
-    response.data   = null;
-    response.header = null;
+    // CONTROLLER >>
+
+    // INSTANCE >>
+    Controller.ins = function(){
+        return new ajaxto();
+    }
 
     //SET METHOD AND URL >>
     Controller.get = function(url){
@@ -102,50 +126,59 @@ const ajaxto = new function(){
 
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function(xhrRes){
+
+            let ajaxResponse = null;
+
             try{
-                response.data = JSON.parse(this.responseText);
-                if(response.data.status === undefined){
-                    throw {msg : "undefined status"}
-                } else if(response.data.code === undefined){
-                    throw {msg : "undefined code"}
-                } else if(response.data.msg === undefined){
-                    throw {msg : "undefined msg"}
-                } else if(response.data.data === undefined){
-                    throw {msg : "undefined data"}
+
+                response.body = JSON.parse(this.responseText);
+                if(response.body.status === undefined){
+                    throw { message : "undefined status" }
                 }
 
-                let responseData =  { ...{ xhr, httpCode: xhr.status }, ...response.data };
+                ajaxResponse = {
+                    ...defaultAjaxResponse,
+                    ...response.body,
+                    ...{
+                        xhr,
+                        httpCode:xhr.status
+                    }
+                };
 
-                //RUN ALL CALLBACK
-                done(responseData);
-                success(responseData);
-                if(responseData.status === true){
-                    resTrue(responseData);
+                // RUN ALL CALLBACK >>
+                success(ajaxResponse);
+                if(ajaxResponse.status === true){
+                    resTrue(ajaxResponse);
                 } else{
-                    resFalse(responseData);
+                    resFalse(ajaxResponse);
                 }
+
             }
             catch(e){
-                let responseData = {
-                    xhr      : xhr,
-                    httpCode : xhr.status,
-                    status   : false,
-                    code     : 'badData',
-                    msg      : e.message,
-                    data     : null
+
+                ajaxResponse = {
+                    ...defaultAjaxResponse,
+                    ...{
+                        xhr,
+                        httpCode : xhr.status,
+                        status   : false,
+                        code     : 'badData',
+                        msg      : e.message
+                    }
+                };
+
+                // RUN ALL CALLBACK >>
+                fail(ajaxResponse);
+                resFalse(ajaxResponse);
+                if(ajaxResponse.httpCode === 404){
+                    notFound(ajaxResponse);
                 }
 
-                //RUN ALL CALLBACK
-                done(responseData);
-                fail(responseData);
-                resFalse(responseData);
-
-                if(responseData.httpCode === 404){
-                    notFound(responseData);
-                }
             }
 
-            _private.clearProcess();
+            // RUN DONE CALLBACK
+            done(ajaxResponse);
+
         });
         xhr.upload.addEventListener('progress', e => {
             let percent = (e.loaded / e.total * 100);
@@ -174,31 +207,23 @@ const ajaxto = new function(){
         return Controller;
 
     }
-
-
-    let _private = new function(){
-
-        this.clearProcess = function(){
-            request.method = 'GET';
-            request.url    = null;
-            request.data   = {};
-            request.header = {};
-
-            response.data   = null;
-            response.header = null;
-
-            progress   = () => {};
-            success    = () => {};
-            fail       = () => {};
-            resTrue    = () => {};
-            resFalse   = () => {};
-            done       = () => {};
-            notFound   = () => {};
-        }
-
-    };
-
+    // CONTROLLER //
 
 
     return Controller;
 };
+
+
+
+
+
+
+class ajax{
+
+
+    merhaba(){
+        console.log('merhaba');
+        return this;
+    }
+
+}
