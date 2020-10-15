@@ -4,10 +4,13 @@ require 'ajaxto.php';
 
 if(empty($_FILES["file"]["name"][0])){
 
-    ajaxto::resFalse(422, 'No files were sent', 'empty');
+    ajaxto::ins()
+        ->httpResCode(422)
+        ->statusCode('empty')
+        ->resFalse('No files were sent');
 
 } else{
 
-    ajaxto::resTrue(200, 'Files have been received', 'success', $_FILES);
+    ajaxto::ins()->statusCode('success')->resTrue('Files have been received', $_FILES);
 
 }
