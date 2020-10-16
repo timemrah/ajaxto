@@ -1,13 +1,14 @@
 const ajaxto = function(){
 
     const Controller = {};
-    const request    = {
+
+    const request = {
         method : 'GET',
         url    : null,
         data   : {},
         header : {}
     };
-    const response   = {
+    const response = {
         body   : null,
         header : null
     };
@@ -22,19 +23,18 @@ const ajaxto = function(){
     let notFound   = () => {};
     // CALLBACK FUNCTIONS //
 
-    let ajaxResponse = null;
     const defaultAjaxResponse = {
-        xhr      : null,
-        httpCode : null,
-        status   : null,
-        code     : null,
-        msg      : null,
-        data     : null,
-        validation: null,
-        clientProcess:{
+        xhr        : null,
+        httpCode   : null,
+        status     : null,
+        code       : null,
+        msg        : null,
+        data       : null,
+        validation : null,
+        clientProcess: {
             innerHtml : null,
-            class: null,
-            direct: null
+            class  : null,
+            direct : null
         }
     };
 
@@ -153,6 +153,10 @@ const ajaxto = function(){
                     resFalse(ajaxResponse);
                 }
 
+                // CLIENT PROCESS >>
+                clientProcess.innerHTml(ajaxResponse.clientProcess.innerHtml);
+                // CLIENT PROCESS //
+
             }
             catch(e){
 
@@ -169,7 +173,6 @@ const ajaxto = function(){
 
                 // RUN ALL CALLBACK >>
                 fail(ajaxResponse);
-                resFalse(ajaxResponse);
                 if(ajaxResponse.httpCode === 404){
                     notFound(ajaxResponse);
                 }
@@ -210,20 +213,36 @@ const ajaxto = function(){
     // CONTROLLER //
 
 
-    return Controller;
-};
 
+    const clientProcess = new function(){
 
+        this.innerHTml = function(items){
+            for(let i in items){
+                let item = items[i];
+                let selectedDom = document.querySelector(item.selector);
+                selectedDom.innerHTML = item.html;
+            }
+        }
 
+        this.class = function(items){
+            for(let i in items){
+                let item = items[i];
+                let selectedDom = document.querySelector(item.selector);
 
+                if(item.process === 'add'){
+                    selectedDom.classList.add(item.class);
+                }
+                else if(item.process === 'remove'){
+                    selectedDom.classList.remove(item.class);
+                }
+                selectedDom.innerHTML = item.html;
+            }
+        }
 
-
-class ajax{
-
-
-    merhaba(){
-        console.log('merhaba');
-        return this;
     }
 
-}
+
+
+
+    return Controller;
+};
