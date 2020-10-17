@@ -9,10 +9,29 @@ class ajaxto
         $clientProcess = null,
         $validation    = null;
 
+    private static $instance = null;
 
+
+    // CREATE INSTANCE OR GET INSTANCED >>
     public static function new(){
+        self::$instance = new self();
+        return self::$instance;
+    }
+
+
+    public static function goOn(){
+        //OLD INSTANCED CLASS GO ON
+        return self::$instance;
+    }
+
+
+    public static function singleton(){
+        if(self::$instance){
+            return self::$instance;
+        }
         return new self();
     }
+    // CREATE INSTANCE OR GET INSTANCED //
 
 
     public function httpCode($code){
@@ -22,20 +41,20 @@ class ajaxto
 
 
     // CLIENT PROCESS >>
-    public function direct($url, $timeout = 0){
-        $this->clientProcess['direct'] = compact('url', 'timeout');
+    public function direct($url, $timeout = 0, $target = '_self'){
+        $this->clientProcess['direct'] = compact('url', 'timeout', 'target');
         return $this;
     }
 
 
     public function innerHtml($selector, $html){
-        $this->clientProcess['innerHtml'][$selector] = compact('selector', 'html');
+        $this->clientProcess['innerHtml'][] = compact('selector', 'html');
         return $this;
     }
 
 
     public function addClass($selector, $class){
-        $this->clientProcess['class'][$selector] = [
+        $this->clientProcess['class'][] = [
             'selector' => $selector,
             'class' => $class,
             'process' => 'add'
@@ -45,7 +64,7 @@ class ajaxto
 
 
     public function removeClass($selector, $class){
-        $this->clientProcess['class'][$selector] = [
+        $this->clientProcess['class'][] = [
             'selector' => $selector,
             'class' => $class,
             'process' => 'remove'
@@ -78,7 +97,7 @@ class ajaxto
     }
 
 
-    public function isInvalidFields(){
+    public function isInvalid(){
         foreach($this->validation as $field){
             if(!$field['status']){ return true; }
         }
@@ -98,7 +117,7 @@ class ajaxto
     }
 
 
-    public function res(bool $status, string $msg = null, string $code = null, $data = null){
+    protected function res(bool $status, string $msg = null, string $code = null, $data = null){
         if($this->httpCode_){
             http_response_code($this->httpCode_);
         }

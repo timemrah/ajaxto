@@ -8,9 +8,12 @@
     <style type="text/css">
         small.helper{ color: red; }
         label{display: block;}
+        form{ margin-bottom: 1rem; }
         form .line{ margin-bottom: 1rem; }
         input{ box-sizing: border-box; padding: 5px; width: 200px; }
         textarea{ box-sizing: border-box; padding: 5px; width: 200px; }
+        input.error{ border-color: red; }
+        input.success{ border-color: green; }
     </style>
 </head>
 <body>
@@ -19,7 +22,6 @@
 
 
 <form id="news-form" action="response.php" method="post">
-    <div id="status-div"></div>
     <div class="line title">
         <label>Konu <small class="helper"></small></label>
         <input name="title" type="text" />
@@ -30,6 +32,7 @@
     </div>
     <button>Gönder</button>
 </form>
+<div id="status-div"></div>
 
 
 
@@ -43,13 +46,17 @@
 
         const formData = new FormData(this);
 
-        new ajaxto().post('response.php').send(formData).done(res => {
+
+
+
+        new ajaxto().post('response.php', formData).resTrue(res => {
             console.log(res);
-        }).resTrue(res => {
-
         }).resFalse(res => {
-
+            console.log(res);
         });
+
+
+
 
     });
 

@@ -14,7 +14,7 @@ const ajaxto = function(){
     };
 
     // CALLBACK FUNCTIONS >>
-    let progress   = () => {};
+    let uploadProgress = () => {};
     let success    = () => {};
     let fail       = () => {};
     let resTrue    = () => {};
@@ -41,30 +41,30 @@ const ajaxto = function(){
     // CONTROLLER >>
 
     // INSTANCE >>
-    Controller.ins = function(){
+    Controller.new = function(){
         return new ajaxto();
     }
 
     //SET METHOD AND URL >>
-    Controller.get = function(url){
+    Controller.get = function(url, data = null){
         request.method = 'GET';
         request.url    = url;
-        return Controller;
+        return send(data);
     }
-    Controller.post = function(url){
+    Controller.post = function(url, data = null){
         request.method = 'POST';
         request.url    = url;
-        return Controller;
+        return send(data);
     }
-    Controller.put = function(url){
+    Controller.put = function(url, data = null){
         request.method = 'PUT';
         request.url    = url;
-        return Controller;
+        return send(data, data);
     }
-    Controller.delete = function(url){
+    Controller.delete = function(url, data = null){
         request.method = 'DELETE';
         request.url    = url;
-        return Controller;
+        return send(data);
     }
 
     //SET HEADER
@@ -79,8 +79,8 @@ const ajaxto = function(){
     }
 
     //UPLOAD PROGRESS HANDLER
-    Controller.progress = function(progressFunction){
-        progress = progressFunction;
+    Controller.uploadProgress = function(uploadProgFunc){
+        uploadProgress = uploadProgFunc;
         return Controller;
     }
 
@@ -117,10 +117,11 @@ const ajaxto = function(){
         notFound = notFoundFunction;
         return Controller;
     }
+    // CONTROLLER //
 
 
-    //AJAX SEND
-    Controller.send = function(data){
+    // AJAX SEND >>
+    const send = function(data = null){
 
         request.data = data;
 
@@ -130,7 +131,6 @@ const ajaxto = function(){
             let ajaxResponse = null;
 
             try{
-
                 response.body = JSON.parse(this.responseText);
                 if(response.body.status === undefined){
                     throw { message : "undefined status" }
@@ -147,16 +147,14 @@ const ajaxto = function(){
 
                 // RUN ALL CALLBACK >>
                 success(ajaxResponse);
-                if(ajaxResponse.status === true){
-                    resTrue(ajaxResponse);
-                } else{
-                    resFalse(ajaxResponse);
-                }
+                if(ajaxResponse.status === true){ resTrue(ajaxResponse); }
+                else{ resFalse(ajaxResponse); }
 
                 // CLIENT PROCESS >>
                 clientProcess.innerHTml(ajaxResponse.clientProcess.innerHtml);
+                clientProcess.class(ajaxResponse.clientProcess.class);
+                clientProcess.direct(ajaxResponse.clientProcess.direct);
                 // CLIENT PROCESS //
-
             }
             catch(e){
 
@@ -173,9 +171,7 @@ const ajaxto = function(){
 
                 // RUN ALL CALLBACK >>
                 fail(ajaxResponse);
-                if(ajaxResponse.httpCode === 404){
-                    notFound(ajaxResponse);
-                }
+                if(ajaxResponse.httpCode === 404){ notFound(ajaxResponse); }
 
             }
 
@@ -183,12 +179,15 @@ const ajaxto = function(){
             done(ajaxResponse);
 
         });
+
+        //XHR UPLOAD PROGRESS
         xhr.upload.addEventListener('progress', e => {
             let percent = (e.loaded / e.total * 100);
-            progress(percent, e);
+            uploadProgress(percent, e);
         });
 
-        if(request.method === 'GET'){
+        //IF THERE IS DATA HERE AND THE METHOD IS GET, THE DATA IS ADDED TO THE URL.
+        if(request.method === 'GET' && request.data){
             let urlParams = new URLSearchParams(request.data).toString();
             request.url += "?" + urlParams;
         }
@@ -201,20 +200,35 @@ const ajaxto = function(){
             xhr.setRequestHeader(key, value);
         }
 
-        if(request.method !== 'GET'){
-            xhr.send(request.data);
-        } else{
-            xhr.send();
-        }
+        //SEND
+        if(request.method !== 'GET'){ xhr.send(request.data); }
+        else{ xhr.send(); }
 
         return Controller;
-
     }
-    // CONTROLLER //
-
+    // AJAX SEND //
 
 
     const clientProcess = new function(){
+
+        this.direct = function(direct){
+
+            let url = direct.url || null;
+            let timeout = direct.timeout || null;
+            let target = direct.target || null;
+
+            if(!url){ return false; }
+
+            let link = document.createElement('a');
+            link.href = direct.url;
+
+            if(target){ link.target = direct.target; }
+            if(timeout){
+                setTimeout(() => { link.click() }, timeout);
+            } else{
+                link.click();
+            }
+        }
 
         this.innerHTml = function(items){
             for(let i in items){
@@ -228,20 +242,16 @@ const ajaxto = function(){
             for(let i in items){
                 let item = items[i];
                 let selectedDom = document.querySelector(item.selector);
-
                 if(item.process === 'add'){
                     selectedDom.classList.add(item.class);
                 }
                 else if(item.process === 'remove'){
                     selectedDom.classList.remove(item.class);
                 }
-                selectedDom.innerHTML = item.html;
             }
         }
 
     }
-
-
 
 
     return Controller;
