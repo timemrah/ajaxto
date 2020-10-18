@@ -1,16 +1,21 @@
-<?php require '../../ajaxto.php';
+<?php
 
-$title   = ajaxto::PUT('title');
-$content = ajaxto::PUT('content');
-$admin   = ajaxto::PUT('member.admin');
-$editor  = ajaxto::PUT('member.editor');
+require '../../ajaxto.php';
+require '../../vendor/RD.php'; //Request Data Plugin
+
+$_PUT = RD::PUT();
+
+$title   = $_PUT['title']; //Same RD::PUT('title')
+$content = $_PUT['content']; //Same RD::PUT('content')
+$admin   = $_PUT['member']['admin']; //Same RD::PUT('member.admin')
+$editor  = $_PUT['member']['editor']; //Same RD::PUT('member.editor')
 
 $ajaxto = ajaxto::new();
 
 // VALIDATION >>
 if($title){
     $ajaxto
-        //Bu kısım kontrolü tarayıcı tarafı dilediği gibi yapması için bilgi veriyoruz.
+        //The browser has been informed about the validation.
         ->valid('title')
         //Bu kısımda sunucu tarafında tarayıcıya hükmediyoruz.
         ->innerHtml('div.title small.helper', '')
@@ -43,8 +48,8 @@ if($ajaxto->isInvalid()){
     $msg = 'Lütfen formu kontrol ediniz';
     return $ajaxto
         ->innerHtml('#status-div', $msg)
-        ->resFalse($msg, 'invalid', ajaxto::PUT());
+        ->resFalse($msg, 'invalid', $_PUT);
 }
 
 
-return $ajaxto->resTrue('İşlem Başarılı', 'success', ajaxto::PUT());
+return $ajaxto->resTrue('İşlem Başarılı', 'success', $_PUT);

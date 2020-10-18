@@ -55,17 +55,11 @@
 
         const formData = new FormData(this);
 
-
-
-
         new ajaxto().put('response.php', formData).resTrue(res => {
             console.log(res);
         }).resFalse(res => {
             console.log(res);
         });
-
-
-
 
     });
 
