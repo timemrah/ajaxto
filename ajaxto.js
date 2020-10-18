@@ -19,6 +19,7 @@ const ajaxto = function(){
     let fail       = () => {};
     let resTrue    = () => {};
     let resFalse   = () => {};
+    let begin      = () => {};
     let done       = () => {};
     let notFound   = () => {};
     // CALLBACK FUNCTIONS //
@@ -85,6 +86,11 @@ const ajaxto = function(){
     }
 
     //THEN PROGRESS
+    Controller.begin = function(beginFunction){
+        //AJAX PROCESS DONE
+        begin = beginFunction;
+        return Controller;
+    }
     Controller.done = function(doneFunction){
         //AJAX PROCESS DONE
         done = doneFunction;
@@ -214,6 +220,10 @@ const ajaxto = function(){
             xhr.setRequestHeader(key, value);
         }
 
+        //BEGIN CALLBACK
+        begin(xhr);
+        ajaxtoEveryTransactionCallback.begin(xhr);
+
         //SEND
         if(request.method !== 'GET'){ xhr.send(request.data); }
         else{ xhr.send(); }
@@ -278,6 +288,7 @@ const ajaxtoEveryTransactionCallback = {
     fail       : () => {},
     resTrue    : () => {},
     resFalse   : () => {},
+    begin      : () => {},
     done       : () => {},
     notFound   : () => {}
 };
