@@ -147,8 +147,16 @@ const ajaxto = function(){
 
                 // RUN ALL CALLBACK >>
                 success(ajaxResponse);
-                if(ajaxResponse.status === true){ resTrue(ajaxResponse); }
-                else{ resFalse(ajaxResponse); }
+                ajaxtoEveryTransactionCallback.success(ajaxResponse);
+
+                if(ajaxResponse.status === true){
+                    resTrue(ajaxResponse);
+                    ajaxtoEveryTransactionCallback.resTrue(ajaxResponse);
+                }
+                else{
+                    resFalse(ajaxResponse);
+                    ajaxtoEveryTransactionCallback.resFalse(ajaxResponse);
+                }
 
                 // CLIENT PROCESS >>
                 clientProcess.innerHTml(ajaxResponse.clientProcess.innerHtml);
@@ -171,12 +179,17 @@ const ajaxto = function(){
 
                 // RUN ALL CALLBACK >>
                 fail(ajaxResponse);
-                if(ajaxResponse.httpCode === 404){ notFound(ajaxResponse); }
+                ajaxtoEveryTransactionCallback.fail(ajaxResponse);
+                if(ajaxResponse.httpCode === 404){
+                    notFound(ajaxResponse);
+                    ajaxtoEveryTransactionCallback.notFound(ajaxResponse);
+                }
 
             }
 
             // RUN DONE CALLBACK
             done(ajaxResponse);
+            ajaxtoEveryTransactionCallback.done(ajaxResponse);
 
         });
 
@@ -184,6 +197,7 @@ const ajaxto = function(){
         xhr.upload.addEventListener('progress', e => {
             let percent = (e.loaded / e.total * 100);
             uploadProgress(percent, e);
+            ajaxtoEveryTransactionCallback.uploadProgress(percent, e);
         });
 
         //IF THERE IS DATA HERE AND THE METHOD IS GET, THE DATA IS ADDED TO THE URL.
@@ -256,3 +270,15 @@ const ajaxto = function(){
 
     return Controller;
 };
+
+// CALLBACK THAT WILL WORK ON EVERY TRANSACTION >>
+const ajaxtoEveryTransactionCallback = {
+    uploadProgress : () => {},
+    success    : () => {},
+    fail       : () => {},
+    resTrue    : () => {},
+    resFalse   : () => {},
+    done       : () => {},
+    notFound   : () => {}
+};
+// CALLBACK THAT WILL WORK ON EVERY TRANSACTION //
