@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EXAMPLE-1</title>
-    <script src="../../ajaxto.js"></script>
-    <link rel="icon" type="image/png" href="https://blgdrop.com/file/img/logo/favicon.png" itemprop="thumbnailUrl"/>
-    <link href="../../style.css" rel="stylesheet" type="text/css" />
+    <title>Title</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="ajaxtoClass.js"></script>
 </head>
 <body>
 
 
-
-
-<form id="news-form" action="response.php" method="post">
+<form id="news-form">
     <div class="line title">
         <label>Konu <small class="helper"></small></label>
         <input name="title" type="text" />
@@ -35,9 +32,8 @@
 <div id="status-div"></div>
 
 
-
-
 <script>
+
 
     const form = document.getElementById('news-form');
 
@@ -45,15 +41,15 @@
         e.preventDefault();
 
         const formData = new FormData(this);
+        const ajax = new ajaxto().get('testResponse.php', formData);
 
-        new ajaxto().put('response.php', formData).resTrue(res => {
+        /*new ajaxto().get('testResponse.php', formData).resTrue(res => {
             console.log(res);
         }).resFalse(res => {
             console.log(res);
-        });
+        });*/
 
     });
-
 </script>
 </body>
 </html>
