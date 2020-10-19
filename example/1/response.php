@@ -34,11 +34,19 @@ if($title){
 if($content){
     //Sadece tarayıcıyı validasyon hakkında bilgilendirdik.
     //Hatayı ekrana yansıtmak için tarayıcı tarafında kodlama gerekir.
-    $ajaxto->valid('content');
+    $ajaxto
+        ->valid('content')
+        ->innerHtml('div.content small.helper', '')
+        ->addClass('div.content textarea', 'success')
+        ->removeClass('div.content textarea', 'error');
 } else{
     //Sadece tarayıcıyı validasyon hakkında bilgilendirdik.
     //Hatayı ekrana yansıtmak için tarayıcı tarafında kodlama gerekir.
-    $ajaxto->invalid('content', 'İçerik alanı boş kalamaz', 'required');
+    $ajaxto
+        ->invalid('content', 'İçerik alanı boş kalamaz', 'required')
+        ->innerHtml('div.content small.helper', 'İçerik alanı boş kalamaz')
+        ->addClass('div.content textarea', 'error')
+        ->removeClass('div.content textarea', 'success');
 }
 // VALIDATION //
 
@@ -51,5 +59,7 @@ if($ajaxto->isInvalid()){
         ->resFalse($msg, 'invalid', $_PUT);
 }
 
-
-return $ajaxto->resTrue('İşlem Başarılı', 'success', $_PUT);
+$msg = 'İşlem Başarılı';
+return $ajaxto
+    ->innerHtml('#status-div', $msg)
+    ->resTrue('İşlem Başarılı', 'success', $_PUT);

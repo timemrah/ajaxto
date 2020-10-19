@@ -10,10 +10,15 @@
         label{display: block;}
         form{ margin-bottom: 1rem; }
         form .line{ margin-bottom: 1rem; }
-        input{ box-sizing: border-box; padding: 5px; width: 200px; }
+
         textarea{ box-sizing: border-box; padding: 5px; width: 200px; }
+        textarea.error{ border-color: red; }
+        textarea.success{ border-color: green; }
+
+        input{ box-sizing: border-box; padding: 5px; width: 200px; border-width: 1px; }
         input.error{ border-color: red; }
         input.success{ border-color: green; }
+
     </style>
 </head>
 <body>

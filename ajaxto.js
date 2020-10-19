@@ -46,7 +46,7 @@ const ajaxto = function(){
         return new ajaxto();
     }
 
-    //SET METHOD AND URL >>
+    //SET METHOD, URL, DATA >>
     Controller.get = function(url, data = null){
         request.method = 'GET';
         request.url    = url;
