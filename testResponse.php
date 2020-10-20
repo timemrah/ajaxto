@@ -1,3 +1,7 @@
 <?php
 
-print_r($_GET);
+require 'ajaxto.php';
+
+
+
+ajaxto::new()->resTrue('', '', $_GET);

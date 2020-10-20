@@ -5,6 +5,7 @@
     <title>Title</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
     <script src="ajaxtoClass.js"></script>
+    <script src="ajaxtoCostumization.js"></script>
 </head>
 <body>
 
@@ -41,7 +42,9 @@
         e.preventDefault();
 
         const formData = new FormData(this);
-        const ajax = new ajaxto().get('testResponse.php', formData);
+        const ajax = new ajaxto().get('testResponse.php', formData).done(res => {
+            console.log(res);
+        });
 
         /*new ajaxto().get('testResponse.php', formData).resTrue(res => {
             console.log(res);

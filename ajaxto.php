@@ -7,11 +7,11 @@ class ajaxto
     private
         $httpCode_     = null,
         $clientProcess = null,
-        $validation    = null;
+        $validation    = null,
+        $data          = null;
 
     private static
-        $instance = null,
-        $putData  = null;
+        $instance = null;
 
 
     // CREATE INSTANCE OR GET INSTANCED >>
@@ -39,6 +39,11 @@ class ajaxto
     public function httpCode($code){
         $this->httpCode_ = $code;
         return $this;
+    }
+
+
+    public function data($data){
+        $this->data = $data;
     }
 
 
@@ -120,9 +125,9 @@ class ajaxto
 
 
     protected function res(bool $status, string $msg = null, string $code = null, $data = null){
-        if($this->httpCode_){
-            http_response_code($this->httpCode_);
-        }
+
+        if($this->httpCode_){ http_response_code($this->httpCode_); }
+        if(!$data){ $data = $this->data; }
 
         $resArr['status'] = $status;
 
