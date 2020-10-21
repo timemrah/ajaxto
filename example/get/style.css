@@ -1,0 +1,7 @@
+header{ padding: 1rem 0; }
+
+#response-text-wrapper{ margin-bottom: 1rem;}
+#response-text-wrapper textarea{ width: 50%; height: 350px; resize: none; }
+
+#response-wrapper{}
+#response-wrapper textarea{ width: 50%; height: 700px; resize: none; }

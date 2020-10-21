@@ -1,23 +1,35 @@
 class ajaxto
 {
 
-    #self = this;
-
-
     request = {
         method      : null,
         url         : null,
+        queryString : null,
         formData    : {},
-        queryString : {},
         header      : {}
     };
-
 
     response = {
         body   : null,
         header : null
     }
 
+    #defaultAjaxResponse = {
+        xhr        : null,
+        httpCode   : null,
+        status     : null,
+        code       : null,
+        msg        : null,
+        data       : null,
+        validation : null,
+        header     : null,
+        body       : null,
+        clientProcess : {
+            innerHtml : null,
+            class     : null,
+            direct    : null
+        }
+    };
 
     #callback = {
         begin          : () => {},
@@ -30,28 +42,10 @@ class ajaxto
         uploadProgress : () => {},
     };
 
-
-    #defaultAjaxResponse = {
-        xhr        : null,
-        httpCode   : null,
-        status     : null,
-        code       : null,
-        msg        : null,
-        data       : null,
-        validation : null,
-        clientProcess: {
-            innerHtml : null,
-            class  : null,
-            direct : null
-        }
-    };
-
-
     static dataTypeRelationshipOfMethod = {
         queryString : ['GET' , 'DELETE'],
         formData    : ['POST', 'PUT']
     }
-
 
     static always = {
         begin          : () => {},
@@ -63,33 +57,6 @@ class ajaxto
         notFound       : () => {},
         uploadProgress : () => {}
     }
-
-
-    /** SET CONNECTION METHOD, URL AND DATA
-     * @param url; The address, can be contain the query string.
-     * @param data; It can be FormData or Object(it can be nested) */
-    get   (url, data = {}){ return this.#requestBuilder('GET',    url, data); }
-    post  (url, data = {}){ return this.#requestBuilder('POST',   url, data); }
-    put   (url, data = {}){ return this.#requestBuilder('PUT',    url, data); }
-    delete(url, data = {}){ return this.#requestBuilder('DELETE', url, data); }
-
-
-    #requestBuilder(method, url, data){
-        this.request.method = method;
-
-        if(ajaxto.dataTypeRelationshipOfMethod.queryString.includes(method)){
-            //Like GET, DELETE..
-            this.request.url = url.split('?')[0];
-            const formData = this.#alwaysFormData(data);
-            this.request.queryString = this.#urlQueryStringMergeDataToURLSearchParams(url, formData);
-        } else{ //Like POST, PUT..
-            this.request.url = url;
-            this.request.formData = this.#alwaysFormData(data);
-        }
-
-        return this.xhr();
-    }
-    // SET CONNECTION METHOD, URL AND DATA //
 
 
     // SET HEADER >>
@@ -141,8 +108,36 @@ class ajaxto
     // SET CALLBACK //
 
 
+    /** SET CONNECTION METHOD, URL AND DATA
+     * @param url; The address, can be contain the query string.
+     * @param data; It can be FormData or Object(it can be nested) */
+    get   (url, data = {}){ return this.#requestBuilder('GET',    url, data); }
+    post  (url, data = {}){ return this.#requestBuilder('POST',   url, data); }
+    put   (url, data = {}){ return this.#requestBuilder('PUT',    url, data); }
+    delete(url, data = {}){ return this.#requestBuilder('DELETE', url, data); }
+
+
+    #requestBuilder(method, url, data){
+        this.request.method = method;
+
+        if(ajaxto.dataTypeRelationshipOfMethod.queryString.includes(method)){
+            //Like GET, DELETE..
+            this.request.url = url.split('?')[0];
+            const formData = this.#alwaysFormData(data);
+            this.request.queryString = this.#urlQueryStringMergeDataToURLSearchParams(url, formData);
+        } else{ //Like POST, PUT..
+            this.request.url = url;
+            this.request.formData = this.#alwaysFormData(data);
+        }
+
+        this.#xhr();
+        return this;
+    }
+    // SET CONNECTION METHOD, URL AND DATA //
+
+
     // BUILD TO XHR AND SEND >>
-    xhr(){
+    #xhr(){
         const xhr = new XMLHttpRequest();
 
         ajaxto.always.begin(xhr, this);
@@ -152,7 +147,9 @@ class ajaxto
             let ajaxResponse = null;
 
             try{
+                this.response.header = this.#getResponseHeaders(xhr.getAllResponseHeaders());
                 this.response.body = JSON.parse(xhr.responseText);
+
                 if(this.response.body.status === undefined){
                     throw {message : "undefined status"}
                 }
@@ -162,9 +159,15 @@ class ajaxto
                     ...this.response.body,
                     ...{
                         xhr,
-                        httpCode : xhr.status
+                        httpCode : xhr.status,
+                        header   : this.response.header,
+                        body     : this.response.body
                     }
                 };
+                ajaxResponse.clientProcess = {
+                    ...this.#defaultAjaxResponse.clientProcess,
+                    ...this.response.body.clientProcess
+                }
 
                 ajaxto.always.success(ajaxResponse, this);
                 this.#callback.success(ajaxResponse);
@@ -177,7 +180,14 @@ class ajaxto
                     this.#callback.resFalse(ajaxResponse);
                 }
 
+                // CLIENT PROCESS >>
+                this.#clientProcess.innerHTml(ajaxResponse.clientProcess.innerHtml);
+                this.#clientProcess.class(ajaxResponse.clientProcess.class);
+                this.#clientProcess.direct(ajaxResponse.clientProcess.direct);
+                // CLIENT PROCESS //
+
             } catch(e){
+                console.log(e);
                 ajaxResponse = {
                     ...this.#defaultAjaxResponse,
                     ...{
@@ -185,7 +195,9 @@ class ajaxto
                         httpCode : xhr.status,
                         status   : false,
                         code     : 'badData',
-                        msg      : e.message
+                        msg      : e.message,
+                        header   : this.response.header,
+                        body     : this.response.body
                     }
                 };
 
@@ -200,7 +212,6 @@ class ajaxto
 
             ajaxto.always.done(ajaxResponse, this);
             this.#callback.done(ajaxResponse);
-
         });
 
         xhr.upload.addEventListener('progress', e => {
@@ -225,6 +236,44 @@ class ajaxto
     // BUILD TO XHR AND SEND >>
 
 
+    // CLIENT PROCESS >>
+    #clientProcess = {
+        innerHTml : function(items){
+            for(let i in items){
+                let item              = items[i];
+                let selectedDom       = document.querySelector(item.selector);
+                selectedDom.innerHTML = item.html;
+            }
+        },
+        class : function(items){
+            for(let i in items){
+                let item        = items[i];
+                let selectedDom = document.querySelector(item.selector);
+                if(item.process === 'add'){
+                    selectedDom.classList.add(item.class);
+                }
+                else if(item.process === 'remove'){
+                    selectedDom.classList.remove(item.class);
+                }
+            }
+        },
+        direct : function(direct){
+            if(direct === null){ return false; }
+            let url     = direct.url || null;
+            let timeout = direct.timeout || null;
+            let target  = direct.target || null;
+
+            if(!url){ return false; }
+
+            let link  = document.createElement('a');
+            link.href = direct.url;
+
+            if(target){ link.target = direct.target; }
+            if(timeout){ setTimeout(() => { link.click() }, timeout);}
+            else{ link.click(); }
+        }
+    };
+    // CLIENT PROCESS //
 
 
     // PRIVATE HELPER METHODS >>
@@ -268,6 +317,22 @@ class ajaxto
 
     #alwaysFormData(data){
         return (data instanceof FormData) ? data : this.#nestedObjToFormData(data);
+    }
+
+
+    #getResponseHeaders(allResponseHeaders){
+        const headers = {};
+        allResponseHeaders.trim().split(/[\r\n]+/).map(value => value.split(/: /))
+            .forEach(keyValue => {
+                headers[keyValue[0].trim()] = keyValue[1].trim();
+            });
+        return headers;
+    }
+
+
+    #camelize(str) {
+        return str.toLowerCase()
+            .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
     }
     // PRIVATE HELPER METHODS //
 

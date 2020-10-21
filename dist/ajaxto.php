@@ -44,6 +44,7 @@ class ajaxto
 
     public function data($data){
         $this->data = $data;
+        return $this;
     }
 
 

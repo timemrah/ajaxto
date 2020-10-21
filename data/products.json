@@ -1,0 +1,17 @@
+[
+  { "id": 1,
+    "title": "Apple juice",
+    "price": 2,
+    "stock": 1000
+  },
+  { "id": 2,
+    "title": "wafer",
+    "price": 0.5,
+    "stock": 5000
+  },
+  { "id": 3,
+    "title": "gum",
+    "price": 0.25,
+    "stock": 10000
+  }
+]
