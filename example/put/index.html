@@ -2,11 +2,10 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>EXAMPLE-1</title>
-
+    <title>List Products - Put Example</title>
     <script src="../../dist/ajaxto.js"></script>
-    <link rel="icon" type="image/png" href="https://blgdrop.com/file/img/logo/favicon.png" itemprop="thumbnailUrl" />
-    <link href="../style.css" rel="stylesheet" type="text/css" />
+    <script src="../../js/ajaxtoCostumization.js"></script>
+    <link rel="stylesheet" href="../../css/publicStyle.css">
 </head>
 <body>
 
@@ -38,23 +37,6 @@
 
 
 
-<script>
-
-    const form = document.getElementById('news-form');
-
-    form.addEventListener('submit', function(e){
-        e.preventDefault();
-
-        const formData = new FormData(this);
-
-        new ajaxto().put('response.php', formData).resTrue(res => {
-            console.log(res);
-        }).resFalse(res => {
-            console.log(res);
-        });
-
-    });
-
-</script>
+<script src="script.js"></script>
 </body>
 </html>

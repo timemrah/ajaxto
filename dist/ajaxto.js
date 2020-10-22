@@ -5,14 +5,14 @@ class ajaxto
         method      : null,
         url         : null,
         queryString : null,
-        formData    : {},
-        header      : {}
+        formData    : null,
+        header      : null
     };
 
     response = {
         body   : null,
         header : null
-    }
+    };
 
     #defaultAjaxResponse = {
         xhr        : null,
@@ -21,9 +21,9 @@ class ajaxto
         code       : null,
         msg        : null,
         data       : null,
+        body       : null,
         validation : null,
         header     : null,
-        body       : null,
         clientProcess : {
             innerHtml : null,
             class     : null,
@@ -45,7 +45,7 @@ class ajaxto
     static dataTypeRelationshipOfMethod = {
         queryString : ['GET' , 'DELETE'],
         formData    : ['POST', 'PUT']
-    }
+    };
 
     static always = {
         begin          : () => {},
@@ -56,7 +56,7 @@ class ajaxto
         resFalse       : () => {},
         notFound       : () => {},
         uploadProgress : () => {}
-    }
+    };
 
 
     // SET HEADER >>
@@ -124,7 +124,7 @@ class ajaxto
             //Like GET, DELETE..
             this.request.url = url.split('?')[0];
             const formData = this.#alwaysFormData(data);
-            this.request.queryString = this.#urlQueryStringMergeDataToURLSearchParams(url, formData);
+            this.request.queryString = this.#urlQueryStringMergeData(url, formData);
         } else{ //Like POST, PUT..
             this.request.url = url;
             this.request.formData = this.#alwaysFormData(data);
@@ -150,6 +150,8 @@ class ajaxto
                 this.response.header = this.#getResponseHeaders(xhr.getAllResponseHeaders());
                 this.response.body = JSON.parse(xhr.responseText);
 
+                //HATA!!!!! throw callback içirisinde de hata oluştuğunda tetikleniyor!!!
+                //throw kullanımını callback çalışmadan sonlandırlaım. hemen catch gelmeli alt satırda.
                 if(this.response.body.status === undefined){
                     throw {message : "undefined status"}
                 }
@@ -169,15 +171,15 @@ class ajaxto
                     ...this.response.body.clientProcess
                 }
 
-                ajaxto.always.success(ajaxResponse, this);
-                this.#callback.success(ajaxResponse);
+                ajaxto.always.success(ajaxResponse, this.request, this);
+                this.#callback.success(ajaxResponse, this.request);
 
                 if(ajaxResponse.status){
-                    ajaxto.always.resTrue(ajaxResponse, this);
-                    this.#callback.resTrue(ajaxResponse);
+                    ajaxto.always.resTrue(ajaxResponse, this.request, this);
+                    this.#callback.resTrue(ajaxResponse, this.request);
                 } else{
-                    ajaxto.always.resFalse(ajaxResponse, this);
-                    this.#callback.resFalse(ajaxResponse);
+                    ajaxto.always.resFalse(ajaxResponse, this.request, this);
+                    this.#callback.resFalse(ajaxResponse, this.request);
                 }
 
                 // CLIENT PROCESS >>
@@ -187,7 +189,6 @@ class ajaxto
                 // CLIENT PROCESS //
 
             } catch(e){
-                console.log(e);
                 ajaxResponse = {
                     ...this.#defaultAjaxResponse,
                     ...{
@@ -201,17 +202,18 @@ class ajaxto
                     }
                 };
 
-                ajaxto.always.fail(ajaxResponse, this);
-                this.#callback.fail(ajaxResponse);
+
+                ajaxto.always.fail(ajaxResponse, this.request, this);
+                this.#callback.fail(ajaxResponse, this.request);
 
                 if(ajaxResponse.status === 404){
-                    ajaxto.always.notFound(ajaxResponse, this);
-                    this.#callback.notFound(ajaxResponse);
+                    ajaxto.always.notFound(ajaxResponse, this.request, this);
+                    this.#callback.notFound(ajaxResponse, this.request);
                 }
             }
 
-            ajaxto.always.done(ajaxResponse, this);
-            this.#callback.done(ajaxResponse);
+            ajaxto.always.done(ajaxResponse, this.request, this);
+            this.#callback.done(ajaxResponse, this.request);
         });
 
         xhr.upload.addEventListener('progress', e => {
@@ -220,7 +222,8 @@ class ajaxto
             this.#callback.uploadProgress(percent, e)
         });
 
-        const url = this.request.queryString ? `${this.request.url}?${this.request.queryString}` : this.request.url;
+        let queryString = this.request.queryString ? new URLSearchParams(this.request.queryString) : '';
+        const url = Array.from(queryString).length ? `${this.request.url}?${queryString}` : this.request.url;
         xhr.open(this.request.method, url);
 
         // SET HEADER OF XHR REQUEST >>
@@ -277,9 +280,9 @@ class ajaxto
 
 
     // PRIVATE HELPER METHODS >>
-    #urlQueryStringMergeDataToURLSearchParams(url, data){
-        let mergedUrlSearchParams = new URLSearchParams();
-        let dataUrlParams = new URLSearchParams(data);
+    #urlQueryStringMergeData(url, data){
+        let dataUrlParams         = new URLSearchParams(data);
+        let mergedUrlSearchParams = Array.from(dataUrlParams).length ? new URLSearchParams() : null;
 
         const currentUrlQueryString = url.split('?')[1];
         if(currentUrlQueryString){
@@ -290,7 +293,8 @@ class ajaxto
             mergedUrlSearchParams.set(key, value);
         });
 
-        return mergedUrlSearchParams;
+        if(!mergedUrlSearchParams){ return null; }
+        return Object.fromEntries(mergedUrlSearchParams);
     }
 
 

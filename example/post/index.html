@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>List Products - POST Example</title>
+    <script src="../../dist/ajaxto.js"></script>
+    <script src="../../js/ajaxtoCostumization.js"></script>
+    <link rel="stylesheet" href="../../css/publicStyle.css">
+</head>
+<body>
+
+
+
+
+<form id="news-form" action="response.php" method="post">
+    <div class="line title">
+        <label>Title <small class="helper"></small></label>
+        <input name="title" type="text" />
+    </div>
+    <div class="line content">
+        <label>Content <small class="helper"></small></label>
+        <textarea name="content"></textarea>
+    </div>
+    <div class="line admin">
+        <label>Admin <small class="helper"></small></label>
+        <input name="member[admin]" type="text" />
+    </div>
+    <div class="line editor">
+        <label>Editor <small class="helper"></small></label>
+        <input name="member[editor]" type="text" />
+    </div>
+
+    <button>Gönder</button>
+</form>
+<div id="status-div"></div>
+
+
+
+
+<script src="script.js"></script>
+</body>
+</html>

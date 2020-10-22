@@ -10,56 +10,76 @@ $content = $_PUT['content']; //Same RD::PUT('content')
 $admin   = $_PUT['member']['admin']; //Same RD::PUT('member.admin')
 $editor  = $_PUT['member']['editor']; //Same RD::PUT('member.editor')
 
-$ajaxto = ajaxto::new();
+$ajaxto = ajaxto::new(); //You don't have to instance to variable.
 
-// VALIDATION >>
+
+// TITLE VALIDATION:
 if($title){
-    $ajaxto
+    $ajaxto //If you want use it without $ajaxto variable: ajaxto::goOn()
         //The browser has been informed about the validation.
         ->valid('title')
-        //Bu kısımda sunucu tarafında tarayıcıya hükmediyoruz.
+        //Server-side DOM controls by javascript
         ->innerHtml('div.title small.helper', '')
-        ->addClass('div.title input', 'success')
-        ->removeClass('div.title input', 'error');
+        ->addRemoveClass('div.title input', 'success', 'error');
 } else{
     $ajaxto
-        //Bu kısım kontrolü tarayıcı tarafı dilediği gibi yapması için bilgi veriyoruz.
+        //The browser has been informed about the validation.
         ->invalid('title', 'Title cannot be empty', 'required')
-        //Bu kısımda sunucu tarafında tarayıcıya hükmediyoruz.
+        //Server-side DOM controls by javascript
         ->innerHtml('div.title small.helper', 'Title cannot be empty')
-        ->addClass('div.title input', 'error')
-        ->removeClass('div.title input', 'success');
+        ->addRemoveClass('div.title input', 'error', 'success');
 }
 
+
+// CONTENT VALIDATION:
 if($content){
-    //Sadece tarayıcıyı validasyon hakkında bilgilendirdik.
-    //Hatayı ekrana yansıtmak için tarayıcı tarafında kodlama gerekir.
     $ajaxto
+        //The browser has been informed about the validation.
         ->valid('content')
+        //Server-side DOM controls by javascript
         ->innerHtml('div.content small.helper', '')
-        ->addClass('div.content textarea', 'success')
-        ->removeClass('div.content textarea', 'error');
+        ->addRemoveClass('div.content textarea', 'success', 'error');
 } else{
-    //Sadece tarayıcıyı validasyon hakkında bilgilendirdik.
-    //Hatayı ekrana yansıtmak için tarayıcı tarafında kodlama gerekir.
     $ajaxto
+        //The browser has been informed about the validation.
         ->invalid('content', 'Content cannot be empty', 'required')
+        //Server-side DOM controls by javascript
         ->innerHtml('div.content small.helper', 'Content cannot be empty')
-        ->addClass('div.content textarea', 'error')
-        ->removeClass('div.content textarea', 'success');
+        ->addRemoveClass('div.content textarea', 'error', 'success');
 }
-// VALIDATION //
 
 
-//HERHANGİ BİR VALİDAYSON HATASI VARSA
+// IF THERE IS THE VALIDATION ERROR
 if($ajaxto->isInvalid()){
-    $msg = 'Please check the form';
     return $ajaxto
-        ->innerHtml('#status-div', $msg)
-        ->resFalse($msg, 'invalid', $_PUT);
+        //The browser has been informed about the validation.
+        ->innerHtml('#status-div', 'Please check the form')
+        //False Response
+        ->resFalse('Please check the form', 'invalid');
 }
 
-$msg = 'İşlem Başarılı';
+
+
+
+
+
+
+
+// UPDATE PROCESS >>
+
+
+// UPDATE PROCESS //
+
+
+
+
+
+
+
+
+// SUCCESS
 return $ajaxto
-    ->innerHtml('#status-div', $msg)
-    ->resTrue('İşlem Başarılı', 'success', $_PUT);
+    //The browser has been informed about the validation.
+    ->innerHtml('#status-div', 'Transaction Successful')
+    //True Response
+    ->resTrue('Transaction Successful', 'success');

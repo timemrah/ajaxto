@@ -79,6 +79,13 @@ class ajaxto
         ];
         return $this;
     }
+
+
+    public function addRemoveClass($selector, $addClass, $removeClass = null){
+        if($addClass)   { $this->addClass($selector, $addClass); }
+        if($removeClass){ $this->removeClass($selector, $removeClass); }
+        return $this;
+    }
     // CLIENT PROCESS //
 
 

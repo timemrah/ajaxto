@@ -1,39 +1,13 @@
-const responseText = new function(){
-    this.dataWrapper = document.getElementById('response-text-wrapper');
-    this.showArea    = this.dataWrapper.querySelector('textarea');
-    this.btn         = this.dataWrapper.querySelector('button');
-};
+const responseBody = document.querySelector('#response-body pre');
+const responseObj  = document.querySelector('#response-object pre');
+const requestObj   = document.querySelector('#request-object pre');
 
 
-const responseObject = new function(){
-    this.dataWrapper = document.getElementById('response-wrapper');
-    this.showArea    = this.dataWrapper.querySelector('textarea');
-};
+new ajaxto().get('response.php').resTrue((res, req) => {
 
+    console.log({res, req});
 
-
-
-responseText.btn.addEventListener('click', _ => {
-
-
-    new ajaxto().get('response.php')
-        .done(res => {
-
-            //res.status = ?
-            console.log(res);
-
-            responseText.showArea.value   = JSON.stringify(res.body, null, 4);;
-            responseObject.showArea.value = JSON.stringify(res, null, 4);
-
-        }).resTrue(res => {
-
-            //res.status = true
-
-        }).resFalse(res => {
-
-            //res.status = false
-
-        });
-
-
+    responseBody.innerHTML = JSON.stringify(res.body, null, 4);
+    responseObj.innerHTML  = JSON.stringify(res, null, 4);
+    requestObj.innerHTML   = JSON.stringify(req, null, 4);
 });
