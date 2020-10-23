@@ -113,6 +113,7 @@ class ajaxto
 
 
     public function isInvalid(){
+        if(!$this->validation){ return false; }
         foreach($this->validation as $field){
             if(!$field['status']){ return true; }
         }

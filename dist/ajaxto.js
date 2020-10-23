@@ -6,6 +6,7 @@ class ajaxto
         url         : null,
         queryString : null,
         formData    : null,
+        data        : null,
         header      : null
     };
 
@@ -21,7 +22,7 @@ class ajaxto
         code       : null,
         msg        : null,
         data       : null,
-        body       : null,
+        text       : null,
         validation : null,
         header     : null,
         clientProcess : {
@@ -108,6 +109,42 @@ class ajaxto
     // SET CALLBACK //
 
 
+    // RUN CALLBACK >>
+    #beginRunCallback(xhr){
+        ajaxto.always.begin(xhr, this);
+        this.#callback.begin(xhr, this);
+    }
+    #doneRunCallback(ajaxResponse){
+        ajaxto.always.done(ajaxResponse, this.request, this);
+        this.#callback.done(ajaxResponse, this.request);
+    }
+    #successRunCallback(ajaxResponse){
+        ajaxto.always.success(ajaxResponse, this.request, this);
+        this.#callback.success(ajaxResponse, this.request);
+    }
+    #failRunCallback(ajaxResponse){
+        ajaxto.always.fail(ajaxResponse, this.request, this);
+        this.#callback.fail(ajaxResponse, this.request);
+    }
+    #resTrueRunCallback(ajaxResponse){
+        ajaxto.always.resTrue(ajaxResponse, this.request, this);
+        this.#callback.resTrue(ajaxResponse, this.request);
+    }
+    #resFalseRunCallback(ajaxResponse){
+        ajaxto.always.resFalse(ajaxResponse, this.request, this);
+        this.#callback.resFalse(ajaxResponse, this.request);
+    }
+    #notFoundRunCallback(ajaxResponse){
+        ajaxto.always.notFound(ajaxResponse, this.request, this);
+        this.#callback.notFound(ajaxResponse, this.request);
+    }
+    #uploadProgressRunCallback(percent, e){
+        ajaxto.always.uploadProgress(percent, e, this);
+        this.#callback.uploadProgress(percent, e)
+    }
+    // RUN CALLBACK >>
+
+
     /** SET CONNECTION METHOD, URL AND DATA
      * @param url; The address, can be contain the query string.
      * @param data; It can be FormData or Object(it can be nested) */
@@ -125,9 +162,11 @@ class ajaxto
             this.request.url = url.split('?')[0];
             const formData = this.#alwaysFormData(data);
             this.request.queryString = this.#urlQueryStringMergeData(url, formData);
+            this.request.data = Object.fromEntries(formData);
         } else{ //Like POST, PUT..
             this.request.url = url;
             this.request.formData = this.#alwaysFormData(data);
+            this.request.data = Object.fromEntries(this.request.formData);
         }
 
         this.#xhr();
@@ -138,57 +177,26 @@ class ajaxto
 
     // BUILD TO XHR AND SEND >>
     #xhr(){
+
         const xhr = new XMLHttpRequest();
 
-        ajaxto.always.begin(xhr, this);
-        this.#callback.begin(xhr, this);
+        this.#beginRunCallback(xhr);
 
         xhr.addEventListener('load', xhrRes => {
             let ajaxResponse = null;
 
-            try{
-                this.response.header = this.#getResponseHeaders(xhr.getAllResponseHeaders());
-                this.response.body = JSON.parse(xhr.responseText);
+            this.response.header = this.#getResponseHeaders(xhr.getAllResponseHeaders());
 
-                //HATA!!!!! throw callback içirisinde de hata oluştuğunda tetikleniyor!!!
-                //throw kullanımını callback çalışmadan sonlandırlaım. hemen catch gelmeli alt satırda.
+            // TRY CATCH >>
+            try{
+
+                this.response.body = JSON.parse(xhr.responseText);
                 if(this.response.body.status === undefined){
                     throw {message : "undefined status"}
                 }
 
-                ajaxResponse = {
-                    ...this.#defaultAjaxResponse,
-                    ...this.response.body,
-                    ...{
-                        xhr,
-                        httpCode : xhr.status,
-                        header   : this.response.header,
-                        body     : this.response.body
-                    }
-                };
-                ajaxResponse.clientProcess = {
-                    ...this.#defaultAjaxResponse.clientProcess,
-                    ...this.response.body.clientProcess
-                }
-
-                ajaxto.always.success(ajaxResponse, this.request, this);
-                this.#callback.success(ajaxResponse, this.request);
-
-                if(ajaxResponse.status){
-                    ajaxto.always.resTrue(ajaxResponse, this.request, this);
-                    this.#callback.resTrue(ajaxResponse, this.request);
-                } else{
-                    ajaxto.always.resFalse(ajaxResponse, this.request, this);
-                    this.#callback.resFalse(ajaxResponse, this.request);
-                }
-
-                // CLIENT PROCESS >>
-                this.#clientProcess.innerHTml(ajaxResponse.clientProcess.innerHtml);
-                this.#clientProcess.class(ajaxResponse.clientProcess.class);
-                this.#clientProcess.direct(ajaxResponse.clientProcess.direct);
-                // CLIENT PROCESS //
-
             } catch(e){
+
                 ajaxResponse = {
                     ...this.#defaultAjaxResponse,
                     ...{
@@ -198,28 +206,52 @@ class ajaxto
                         code     : 'badData',
                         msg      : e.message,
                         header   : this.response.header,
-                        body     : this.response.body
+                        text     : xhr.responseText
                     }
                 };
 
+                //RUN CALLBACKS
+                if(ajaxResponse.status === 404){ this.#notFoundRunCallback(ajaxResponse); }
+                this.#failRunCallback(ajaxResponse);
+                this.#doneRunCallback(ajaxResponse);
 
-                ajaxto.always.fail(ajaxResponse, this.request, this);
-                this.#callback.fail(ajaxResponse, this.request);
+                return false;
+            }
+            // TRY CATCH //
 
-                if(ajaxResponse.status === 404){
-                    ajaxto.always.notFound(ajaxResponse, this.request, this);
-                    this.#callback.notFound(ajaxResponse, this.request);
+
+            ajaxResponse = {
+                ...this.#defaultAjaxResponse,
+                ...this.response.body,
+                ...{
+                    xhr,
+                    httpCode : xhr.status,
+                    header   : this.response.header,
+                    text     : xhr.responseText
                 }
+            };
+            ajaxResponse.clientProcess = {
+                ...this.#defaultAjaxResponse.clientProcess,
+                ...this.response.body.clientProcess
             }
 
-            ajaxto.always.done(ajaxResponse, this.request, this);
-            this.#callback.done(ajaxResponse, this.request);
+            // CLIENT PROCESS >>
+            this.#clientProcess.innerHTml(ajaxResponse.clientProcess.innerHtml);
+            this.#clientProcess.class(ajaxResponse.clientProcess.class);
+            this.#clientProcess.direct(ajaxResponse.clientProcess.direct);
+            // CLIENT PROCESS //
+
+            // RUN CALLBACKS
+            this.#successRunCallback(ajaxResponse);
+            if(ajaxResponse.status){ this.#resTrueRunCallback(ajaxResponse);  }
+            else                   { this.#resFalseRunCallback(ajaxResponse); }
+            this.#doneRunCallback(ajaxResponse);
+
         });
 
         xhr.upload.addEventListener('progress', e => {
             let percent = (e.loaded / e.total * 100);
-            ajaxto.always.uploadProgress(percent, e, this);
-            this.#callback.uploadProgress(percent, e)
+            this.#uploadProgressRunCallback(percent, e);
         });
 
         let queryString = this.request.queryString ? new URLSearchParams(this.request.queryString) : '';
@@ -331,12 +363,6 @@ class ajaxto
                 headers[keyValue[0].trim()] = keyValue[1].trim();
             });
         return headers;
-    }
-
-
-    #camelize(str) {
-        return str.toLowerCase()
-            .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
     }
     // PRIVATE HELPER METHODS //
 

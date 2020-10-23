@@ -1,12 +1,11 @@
-small.helper{ color: red; }
+small{ color: red; }
 label{display: block;}
 form{ margin-bottom: 1rem; }
 form .line{ margin-bottom: 1rem; }
+pre{ padding: 1rem; background-color: #EEE; border: 1px solid #DDD; overflow: auto; }
 
 textarea{ box-sizing: border-box; padding: 5px; width: 200px; }
-textarea.error{ border-color: red; }
-textarea.success{ border-color: green; }
-
 input{ box-sizing: border-box; padding: 5px; width: 200px; border-width: 1px; }
-input.error{ border-color: red; }
-input.success{ border-color: green; }
+
+.error{ border-color: red; color: red; }
+.success{ border-color: green; color: green; }

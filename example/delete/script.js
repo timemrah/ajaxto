@@ -3,7 +3,7 @@ const responseObj  = document.querySelector('#response-object pre');
 const requestObj   = document.querySelector('#request-object pre');
 
 
-new ajaxto().get('response.php')
+new ajaxto().delete('response.php', {id: 2})
     .done((res, req) => {
 
         //This place always works.

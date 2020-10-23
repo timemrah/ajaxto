@@ -3,11 +3,14 @@
 
 
 ### What is ajaxto
-**ajaxto provides server-side javascript controls.**
+Ajaxto provides a useful javascript library for php server.
 
-A simple way to manage the browser as a result of the Ajax process by the PHP server.
+This library is used for 'restful' transaction but has more capabilities.
 
-It's not enough for us to check the form entries on the browser side, and we check the data on the server side. Then we can only control the server and manage the browser.
+- **Ajaxto also provides server-side javascript controls.**
+- **It can also help you with your validation process.**
+
+---
 
 ### Front End Ajax Request Code Example
 ```javascript

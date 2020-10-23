@@ -34,7 +34,7 @@ if($content){
 // IF THERE IS THE VALIDATION ERROR
 if($ajaxto->isInvalid()){
     //False Response
-    return $ajaxto->resFalse('Please check the form', 'invalid');
+    return $ajaxto->resFalse('Please check the form', 'validationError');
 }
 
 

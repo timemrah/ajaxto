@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>List Products - Put Example</title>
     <script src="../../dist/ajaxto.js"></script>
-    <script src="../../js/ajaxtoCostumization.js"></script>
     <link rel="stylesheet" href="../../css/publicStyle.css">
 </head>
 <body>
@@ -12,27 +11,55 @@
 
 
 
+<h1 style="margin-bottom: 3rem;">Update - PUT Example</h1>
+
+<div style="margin-bottom: 1rem;" id="status-div"></div>
+
 <form id="news-form" action="response.php" method="post">
+    <div class="line id">
+        <label>ID <small></small></label>
+        <input name="id" value="2" type="text" />
+    </div>
     <div class="line title">
-        <label>Title <small class="helper"></small></label>
-        <input name="title" type="text" />
+        <label>Title <small></small></label>
+        <input name="title" type="text" value="Other News Title 2" />
     </div>
     <div class="line content">
-        <label>Content <small class="helper"></small></label>
-        <textarea name="content"></textarea>
+        <label>Content <small></small></label>
+        <textarea name="content">Other news content 2 bla bla...</textarea>
+    </div>
+    <div class="line date">
+        <label>Date <small></small></label>
+        <input name="date" type="date" value="2020-10-21" />
     </div>
     <div class="line admin">
-        <label>Admin <small class="helper"></small></label>
-        <input name="member[admin]" type="text" />
+        <label>Admin <small></small></label>
+        <input name="member[admin]" type="text" value="Emrah" />
     </div>
     <div class="line editor">
-        <label>Editor <small class="helper"></small></label>
-        <input name="member[editor]" type="text" />
+        <label>Editor <small></small></label>
+        <input name="member[editor]" type="text" value="Murat" />
     </div>
-
     <button>Gönder</button>
 </form>
-<div id="status-div"></div>
+
+
+
+
+<div style="margin-bottom: 3rem;" id="response-text">
+    <h2>Response Text ( res.text )</h2>
+    <pre></pre>
+</div>
+
+<div style="margin-bottom: 3rem;" id="response-object">
+    <h2>Response Object ( res )</h2>
+    <pre></pre>
+</div>
+
+<div id="request-object">
+    <h2>Request Object ( req )</h2>
+    <pre></pre>
+</div>
 
 
 

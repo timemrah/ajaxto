@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>List Products - POST Example</title>
     <script src="../../dist/ajaxto.js"></script>
-    <script src="../../js/ajaxtoCostumization.js"></script>
     <link rel="stylesheet" href="../../css/publicStyle.css">
 </head>
 <body>
@@ -12,27 +11,47 @@
 
 
 
+<h1 style="margin-bottom: 3rem;">Update - PUT Example</h1>
+
+<div style="margin-bottom: 1rem;" id="status-div"></div>
+
 <form id="news-form" action="response.php" method="post">
     <div class="line title">
-        <label>Title <small class="helper"></small></label>
+        <label>Title <small></small></label>
         <input name="title" type="text" />
     </div>
     <div class="line content">
-        <label>Content <small class="helper"></small></label>
+        <label>Content <small></small></label>
         <textarea name="content"></textarea>
     </div>
     <div class="line admin">
-        <label>Admin <small class="helper"></small></label>
+        <label>Admin <small></small></label>
         <input name="member[admin]" type="text" />
     </div>
     <div class="line editor">
-        <label>Editor <small class="helper"></small></label>
+        <label>Editor <small></small></label>
         <input name="member[editor]" type="text" />
     </div>
-
     <button>Gönder</button>
 </form>
-<div id="status-div"></div>
+
+
+
+
+<div style="margin-bottom: 3rem;" id="response-text">
+    <h2>Response Text ( res.text )</h2>
+    <pre></pre>
+</div>
+
+<div style="margin-bottom: 3rem;" id="response-object">
+    <h2>Response Object ( res )</h2>
+    <pre></pre>
+</div>
+
+<div id="request-object">
+    <h2>Request Object ( req )</h2>
+    <pre></pre>
+</div>
 
 
 
