@@ -14,21 +14,32 @@ This library is used for 'restful' transaction but has more capabilities.
 
 ### Front End Ajax Request Code Example
 ```javascript
-new ajaxto().post(url, data).resTrue(res => {
-  /* The ajax process was successfull and 
-     serverside ajaxto process status is true. */
+new ajaxto().post(url, data)
+    .done((res, req) => {
 
-  // Do something positive..
-}).resFalse(res => {
-    /* The ajax process was successfull and 
-       serverside ajaxto process status is false. */
+        //This place always works.
 
-    // Do something negative..
-}).fail(res => {
-    /* The ajax process was fail */
+    }).success((res, req) => {
 
-    // Do something for fail..
-});
+        //Ajax process success. The values returned from the server are ok.
+        //The status value returned from the server is "true" or "false".
+
+    }).resTrue((res, req) => {
+
+        //Ajax process success. The values returned from the server are ok.
+        //The status value returned from the server is "true".
+
+    }).resFalse((res, req) => {
+
+        //Ajax process success. The values returned from the server are ok.
+        //The status value returned from the server is "false".
+
+    }).fail((res, req) => {
+
+        //Ajax process is fail!
+        //There is a problem with the value returned from the server.
+
+    });
 ```
 
 ### Back End Response of Ajax PHP Code Example
