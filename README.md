@@ -14,44 +14,19 @@ This library is used for 'restful' transaction but has more capabilities.
 
 ### Front End Ajax Request Code Example
 ```javascript
-new ajaxto().post(url, data)
-    .done((res, req) => {
+new ajaxto().post(url, data).resTrue((res, req) => {
 
-        //This place always works.
+    //It meets the response created with resTrue() on the server side.
 
-    }).success((res, req) => {
-
-        //Ajax process success. The values returned from the server are ok.
-        //The status value returned from the server is "true" or "false".
-
-    }).resTrue((res, req) => {
-
-        //Ajax process success. The values returned from the server are ok.
-        //The status value returned from the server is "true".
-
-    }).resFalse((res, req) => {
-
-        //Ajax process success. The values returned from the server are ok.
-        //The status value returned from the server is "false".
-
-    }).fail((res, req) => {
-
-        //Ajax process is fail!
-        //There is a problem with the value returned from the server.
-
-    });
+})
 ```
 
 ### Back End Response of Ajax PHP Code Example
 ```php
 require 'ajaxto.php';
 
-ajaxto::new() 
-    //Set javascript process for ajax response
-    ->innerHtml('#elmID', 'Html and text string')
-    ->addClass('#elmID', 'is-valid')
-    //Positive Ajax Response
-    ->resTrue('message', 'statusCode', 'data');
+//Positive Ajax Response
+ajaxto::new()->resTrue(message (string), statusCode (string), data (array));
 ```
 
 ### Available Back End Methods
@@ -59,20 +34,20 @@ ajaxto::new()
 new()
 goOn()
 singleton()
-innerHtml('selector', 'html or text string')
-addClass('selector', 'className')
-removeClass('selector', 'className')
-valid('field', 'msg', 'code')
-invalid('field', 'msg', 'code')
+innerHtml(selector (string), html (string))
+addClass(selector (string), className (string))
+removeClass(selector (string), className (string))
+valid(field (string), msg (string), code (string))
+invalid(field (string), msg (string), code (string))
 isInvalid()
-direct('url', 'timeout', 'target')
-httpCode('httpStatusCode')
-resTrue('msg', 'code', 'data')
-resFalse('msg', 'code', 'data')
+direct(url (string), timeout (int), target (string))
+httpCode(httpStatusCode (int))
+resTrue(msg (string), code (string), data (array))
+resFalse(msg (string), code (string), data (array))
 
 //Ajax Response With JSON
-ajaxto::new()->resTrue('msg', 'statusCode', data); //Positive ajax response
-ajaxto::new()->resFalse('msg', 'statusCode', data); //Negative ajax response with alert
+ajaxto::new()->resTrue(message (string), statusCode (string), data (array)); //Positive ajax response
+ajaxto::new()->resFalse(message (string), statusCode (string), data (array)); //Negative ajax response with alert
 ```
 
 **More information will be added.**
