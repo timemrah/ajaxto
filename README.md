@@ -23,8 +23,6 @@ new ajaxto().post(url, data).resTrue((res, req) => {
 
 ### Back End Response of Ajax PHP Code Example
 ```php
-require 'ajaxto.php';
-
 //Positive Ajax Response
 ajaxto::new()->resTrue(message (string), statusCode (string), data (array));
 ```
