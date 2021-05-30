@@ -110,6 +110,7 @@ class ajaxto
 
 
     // RUN CALLBACK >>
+    // TO CALL TWO FUNCTIONS AT THE SAME TIME
     #beginRunCallback(xhr){
         ajaxto.always.begin(xhr, this);
         this.#callback.begin(xhr, this);
@@ -182,6 +183,7 @@ class ajaxto
 
         this.#beginRunCallback(xhr);
 
+        // XHR LOAD EVENT >>
         xhr.addEventListener('load', xhrRes => {
             let ajaxResponse = null;
 
@@ -248,12 +250,15 @@ class ajaxto
             this.#doneRunCallback(ajaxResponse);
 
         });
+        // XHR LOAD EVENT >>
 
+        // XHR PROGRESS EVENT >>
         xhr.upload.addEventListener('progress', e => {
             let percent = (e.loaded / e.total * 100);
             this.#uploadProgressRunCallback(percent, e);
         });
 
+        //IF NECESSARY GENERATE TO QUERY STRING FOR GET or DELETE REQUEST
         let queryString = this.request.queryString ? new URLSearchParams(this.request.queryString) : '';
         const url = Array.from(queryString).length ? `${this.request.url}?${queryString}` : this.request.url;
         xhr.open(this.request.method, url);
@@ -294,18 +299,18 @@ class ajaxto
         },
         direct : function(direct){
             if(direct === null){ return false; }
-            let url     = direct.url || null;
+            let url     = direct.url     || null;
             let timeout = direct.timeout || null;
-            let target  = direct.target || null;
+            let target  = direct.target  || null;
 
             if(!url){ return false; }
 
-            let link  = document.createElement('a');
-            link.href = direct.url;
+            if(timeout){
+                setTimeout(()=>{ location = direct.target; }, timeout);
+                return;
+            }
 
-            if(target){ link.target = direct.target; }
-            if(timeout){ setTimeout(() => { link.click() }, timeout);}
-            else{ link.click(); }
+            location = direct.target;
         }
     };
     // CLIENT PROCESS //
