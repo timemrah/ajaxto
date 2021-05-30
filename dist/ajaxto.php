@@ -112,7 +112,7 @@ class ajaxto
     }
 
 
-    public function isInvalid(){
+    public function isInvalid():bool{
         if(!$this->validation){ return false; }
         foreach($this->validation as $field){
             if(!$field['status']){ return true; }
@@ -123,24 +123,31 @@ class ajaxto
 
 
     // RESPONSE >>
-    public function resTrue(string $msg = null, string $code = null, $data = null){
+    public function resTrue(string $msg = null, string $code = null, $data = null):bool{
         return $this->res(true, $msg, $code, $data);
     }
 
 
-    public function resFalse(string $msg = null, string $code = null, $data = null){
+    public function resFalse(string $msg = null, string $code = null, $data = null):bool{
         return $this->res(false, $msg, $code, $data);
     }
 
 
-    protected function res(bool $status, string $msg = null, string $code = null, $data = null){
+    protected function res(bool $status, string $msg = null, string $code = null, $data = null) : bool {
 
         if($this->httpCode_){ http_response_code($this->httpCode_); }
         if(!$data){ $data = $this->data; }
 
         $resArr['status'] = $status;
 
-        if($msg){ $resArr['msg'] = $msg; }
+        if($msg){
+            $cleanMsg = $this->cleaningAttrFromMsg($msg);
+            $resArr['msg'] = $cleanMsg['msg'];
+
+            if($cleanMsg['mission']){
+                $resArr['msgBehavior'] = $cleanMsg['behavior'];
+            }
+        }
         if($code){ $resArr['code'] = $code; }
         if($data){ $resArr['data'] = $data; }
         if($this->validation){ $resArr['validation'] = $this->validation; }
@@ -151,5 +158,22 @@ class ajaxto
     }
     // RESPONSE //
 
+
+    // PRIVATE >>
+    private function cleaningAttrFromMsg($msg):array{
+
+        $return = [
+            'msg'     => $msg,
+            'behavior' => null
+        ];
+
+        if(strpos($msg, '{alert}:') === 0){
+            $return['msg'] = substr($msg, 7);
+            $return['behavior'] = 'alert';
+        }
+
+        return $return;
+    }
+    // PRIVATE //
 
 }
