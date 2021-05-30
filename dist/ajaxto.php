@@ -144,7 +144,7 @@ class ajaxto
             $cleanMsg = $this->cleaningAttrFromMsg($msg);
             $resArr['msg'] = $cleanMsg['msg'];
 
-            if($cleanMsg['mission']){
+            if($cleanMsg['msgBehavior']){
                 $resArr['msgBehavior'] = $cleanMsg['behavior'];
             }
         }
