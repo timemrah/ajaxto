@@ -7,7 +7,7 @@ class ajaxto
     private
         $httpCode_     = null,
         $clientProcess = null,
-        $validation    = null,
+        $validation    = [],
         $data          = null;
 
     private static
@@ -89,7 +89,12 @@ class ajaxto
     // CLIENT PROCESS //
 
 
-    // VALIDATION SETTER >>
+    // VALIDATION >>
+    public function setValidationFields($fields){
+        $this->validation = array_merge($this->validation, $fields);
+    }
+
+
     public function valid(string $field, string $msg = null, $code = null){
         $this->validation[$field] = [
             'field' => $field,
@@ -112,6 +117,23 @@ class ajaxto
     }
 
 
+    public function validationClear($field){
+        $this->validation[$field] = [
+            'field' => $field,
+            'msg' => null,
+            'status' => null,
+            'code' => null
+        ];
+        return $this;
+    }
+
+
+    public function unsetValid(string $field){
+        unset($this->validation[$field]);
+        return $this;
+    }
+
+
     public function isInvalid():bool{
         if(!$this->validation){ return false; }
         foreach($this->validation as $field){
@@ -119,20 +141,11 @@ class ajaxto
         }
         return false;
     }
-    // VALIDATION SETTER //
+    // VALIDATION //
+
 
 
     // RESPONSE >>
-    public function resTrue(string $msg = null, string $code = null, $data = null):bool{
-        return $this->res(true, $msg, $code, $data);
-    }
-
-
-    public function resFalse(string $msg = null, string $code = null, $data = null):bool{
-        return $this->res(false, $msg, $code, $data);
-    }
-
-
     protected function res(bool $status, string $msg = null, string $code = null, $data = null) : bool {
 
         if($this->httpCode_){ http_response_code($this->httpCode_); }
@@ -156,6 +169,22 @@ class ajaxto
         echo json_encode($resArr);
         return $status;
     }
+
+    public function resTrue(string $msg = null, string $code = null, $data = null):bool{
+        return $this->res(true, $msg, $code, $data);
+    }
+
+    public function resFalse(string $msg = null, string $code = null, $data = null):bool{
+        return $this->res(false, $msg, $code, $data);
+    }
+
+    public function resTrueAlert(string $msg = null, string $code = null, $data = null):bool{
+        return $this->res(true, '{alert}:' . $msg, $code, $data);
+    }
+
+    public function resFalseAlert(string $msg = null, string $code = null, $data = null):bool{
+        return $this->res(false, '{alert}:' . $msg, $code, $data);
+    }
     // RESPONSE //
 
 
@@ -168,7 +197,7 @@ class ajaxto
         ];
 
         if(strpos($msg, '{alert}:') === 0){
-            $return['msg'] = substr($msg, 7);
+            $return['msg'] = substr($msg, 8);
             $return['behavior'] = 'alert';
         }
 

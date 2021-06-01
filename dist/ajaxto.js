@@ -70,6 +70,21 @@ class ajaxto
         this.request.header['X-Token'] = token;
         return this;
     }
+    // CLASS SHORT USE >>
+    static header(keyValues){
+        const _ajaxto = new ajaxto();
+
+        for(let i in keyValues){
+            _ajaxto.request.header[i] = keyValues[i];
+        }
+
+        return _ajaxto;
+    }
+    static token(token){
+        const _ajaxto = new ajaxto();
+        return _ajaxto.token(token);
+    }
+    // CLASS SHORT USE //
     // SET HEADER //
 
 
@@ -153,6 +168,46 @@ class ajaxto
     post  (url, data = {}){ return this.#requestBuilder('POST',   url, data); }
     put   (url, data = {}){ return this.#requestBuilder('PUT',    url, data); }
     delete(url, data = {}){ return this.#requestBuilder('DELETE', url, data); }
+
+
+    // CLASS SHORT USE >>
+    static get(url, data = {}){
+        const _ajaxto = new ajaxto();
+        return _ajaxto.get(url, data);
+    }
+    static post(url, data = {}){
+        const _ajaxto = new ajaxto();
+        return _ajaxto.post(url, data);
+    }
+    static put(url, data = {}){
+        const _ajaxto = new ajaxto();
+        return _ajaxto.put(url, data);
+    }
+    static del(url, data = {}){
+        const _ajaxto = new ajaxto();
+        return _ajaxto.delete(url, data);
+    }
+    static formGet($form, data = {}){
+        const _ajaxto = new ajaxto();
+        let sendFormData = _ajaxto.#formDataCombine(new FormData($form), data);
+        return _ajaxto.get($form.action, sendFormData);
+    }
+    static formPost($form, data = {}){
+        const _ajaxto = new ajaxto();
+        let sendFormData = _ajaxto.#formDataCombine(new FormData($form), data);
+        return _ajaxto.post($form.action, sendFormData);
+    }
+    static formPut($form, data = {}){
+        const _ajaxto = new ajaxto();
+        let sendFormData = _ajaxto.#formDataCombine(new FormData($form), data);
+        return _ajaxto.put($form.action, sendFormData);
+    }
+    static formDel($form, data = {}){
+        const _ajaxto = new ajaxto();
+        let sendFormData = _ajaxto.#formDataCombine(new FormData($form), data);
+        return _ajaxto.delete($form.action, sendFormData);
+    }
+    // CLASS SHORT USE //
 
 
     #requestBuilder(method, url, data){
@@ -299,18 +354,18 @@ class ajaxto
         },
         direct : function(direct){
             if(direct === null){ return false; }
-            let url     = direct.url     || null;
+            let url     = direct.url || null;
             let timeout = direct.timeout || null;
-            let target  = direct.target  || null;
+            let target  = direct.target || null;
 
             if(!url){ return false; }
 
-            if(timeout){
-                setTimeout(()=>{ location = direct.target; }, timeout);
-                return;
-            }
+            let link  = document.createElement('a');
+            link.href = direct.url;
 
-            location = direct.target;
+            if(target){ link.target = direct.target; }
+            if(timeout){ setTimeout(() => { link.click() }, timeout);}
+            else{ link.click(); }
         }
     };
     // CLIENT PROCESS //
@@ -368,6 +423,18 @@ class ajaxto
                 headers[keyValue[0].trim()] = keyValue[1].trim();
             });
         return headers;
+    }
+
+
+    #formDataCombine(formData1, formData2){
+
+        formData2 = this.#alwaysFormData(formData2);
+
+        for(let pair of formData2.entries()){
+            formData1.append(pair[0], pair[1]);
+        }
+
+        return formData1;
     }
     // PRIVATE HELPER METHODS //
 
